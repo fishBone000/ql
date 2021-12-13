@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 int length;
 #define LENGTH_16 length
@@ -20,8 +21,9 @@ void sort(int *list){
 		if(j == -1)
 			break;
 		flags[j] = 1;
-		result[result[0]++] = min;
+		result[++result[0]] = min;
 	}
+	memcpy(list, result+1, LENGTH_16*sizeof(int));
 	free(flags);
 	free(result);
 	return;
@@ -61,8 +63,7 @@ int main(){
 		goto end;
 	sort(result+1);
 	for(int i = 0; i < LENGTH_16; i++){
-		int element = result[i+1];
-		fprintf(stdout, "%d ", element);
+		fprintf(stdout, "%d ", result[i+1]);
 	}
 	end: free(reserveA);
 	     free(reserveB);
