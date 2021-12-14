@@ -57,18 +57,25 @@ void sort(int *list){
 }
 
 int main(){
-	int m, n;
+	//这个程序的思路是：
+	//读取并储存俩数组，遍历之，找到交集
+	//然后用sort（自己写的，在上边）函数排序
+	int m, n;//这俩变量用来储存数组长度
 	scanf("%d %d", &m, &n);
-	int *listA = (int*)calloc(m, sizeof(int));
+	int *listA = (int*)calloc(m, sizeof(int));//calloc用于分配内存，用法看sort里的注释
 	int *listB = (int*)calloc(n, sizeof(int));
-	int *reserveA = listA;
-	int *reserveB = listB;
+	int *reserveA = listA;	//另外储存这俩被分配的内存空间的地址，方便后续释放内存
+	int *reserveB = listB;	//因为后面listA和listB这俩指针可能会调换
+				//其实不储存也没关系吧……之前debug的时候不太清楚，就这么干了
+				//之所以不改一改这个代码……是因为要临时加注释啦
 
-	for(int i = 0; i < m; i++)
+	for(int i = 0; i < m; i++)//读取俩数组
 		scanf("%d", listA+i);
 	for(int i = 0; i < n; i++)
 		scanf("%d", listB+i);
 
+	//为了方便，检查listA是否比listB长，如果是的话，就调换一下
+	//使得listA的长度和listB相等或者更小
 	if(m>n){
 		int *p_temp, temp;
 		p_temp = listA;
@@ -79,20 +86,42 @@ int main(){
 		n = temp;
 	}
 
+	//分配result的内存地址
+	//之所以是m+1，是因为：
+	//俩数组的交集不可能比最小的数组还要长；
+	//此外result的第一个元素用于储存数组长度
+	//不是分配了m+1个元素吗？为什么还要额外储存长度呢
+	//是因为交集的长度不一定就m个元素那么多
 	int *result = (int*)calloc(m+1, sizeof(int));
 
 	for(int i = 0; i < m; i++)
-		for(int j = 0; j < n; j++)
-			if(listA[i] == listB[j])
-				result[++result[0]] = listA[i];
-	LENGTH_16 = result[0];
-	if(!LENGTH_16)
-		goto end;
-	sort(result+1);
+		for(int j = 0; j < n; j++)//遍历俩数组
+			if(listA[i] == listB[j])//如果这俩元素相等的话
+				result[++result[0]] = listA[i];//看下面的注释
+				//     ^^^^^^^^^^^ （不知道对齐了没有，反正我标记的是++result[0]
+				//     这里是为了让result第一个元素（即result长度）自增，然后返回
+				//接着把这个相等的俩元素储存在result的末尾
+	LENGTH_16 = result[0];	//把result的长度储存在全局变量中，方便sort函数排序
+				//因为sort需要知道要排序的数组有多长
+				//为什么要用全局变量？老师不是说最好不用吗
+				//因为这里好用啦
+				//把长度储存在result开头也没问题，只是我不想改代码了……
+				//因为sort函数其实是从之前某一节的代码复制过来的
+
+	if(!LENGTH_16)		//如果LENGTH_16为0，即交集为空，则跳到end
+		goto end;	//我知道最好别用goto……但……这里看起来挺好用的
+				//如果你不想用当然也可以啦
+
+	sort(result+1);		//result+1的意思是从第二个（从一开始数）元素开始排序，因为第一个元素用于储存result长度
 	for(int i = 0; i < LENGTH_16; i++){
-		fprintf(stdout, "%d ", result[i+1]);
+		fprintf(stdout, "%d ", result[i+1]);	//fprintf用于在数据流中输出数据
+							//因为这里用的是stdout数据流，所以和printf应该没什么区别
+							//你可以试着用stderr
+							//有时候如果程序出错被终止，stdout里的数据好像不一定会打印出来
+							//但stderr就可以
+							//此外，数据流也可以用文件数据流，这样的话就可以往文件里写入数据了
 	}
-	end: free(reserveA);
+	end: free(reserveA);//释放内存
 	     free(reserveB);
 	     free(result);
 	return 0;
