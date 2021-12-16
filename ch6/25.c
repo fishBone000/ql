@@ -14,17 +14,20 @@ int main(){
 
 	do{
 		i++;
-		j++;
-		j %= 30;
-		if(flags[j])
-			j++;
+		j = (j+1)%30;
+		while(flags[j]){
+			j = (j+1)%30;
+		}
 
-		if(!(i%9))
+		if(!(i%9)){
 			flags[j] = 1;
+		}
 	}while(i/9 < 15);
 
-	for(int j = 0; j < 30; j++)
-		printf("%d:%d ", j+1, flags[j]);
+	for(int j = 0; j < 30; j++){
+		printf("%d:%d", j+1, flags[j]);
+		putchar(j==14?'\n':' ');
+	}
 
 	return 0;
 }
